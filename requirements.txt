@@ -1,0 +1,4 @@
+# Day 14 — RAG Evaluation lab
+# The solution itself is Python stdlib-only (re, json, dataclasses, statistics).
+# pytest is required to run the test suite and the CI quality gate.
+pytest>=8.0
