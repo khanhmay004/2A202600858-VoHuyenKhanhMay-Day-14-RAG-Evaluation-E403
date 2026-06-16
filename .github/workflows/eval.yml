@@ -1,0 +1,40 @@
+# RAG Evaluation Quality Gate — CI/CD integration (Bonus)
+#
+# NOTE: This file is stored at ci/eval-workflow.yml (NOT .github/workflows/) so it
+# can be pushed with a normal token. To run it as a real GitHub Action, move it to
+# .github/workflows/eval.yml — that path requires a token with the `workflow` scope
+# (e.g. `gh auth refresh -s workflow`, or a PAT with repo + workflow scope).
+#
+# Evaluation-as-CI: run unit tests + the offline benchmark quality gate on every
+# push / PR to main. An agent that fails the eval gate cannot be merged/deployed
+# (same idea as a failed unit test).
+
+name: RAG Evaluation Quality Gate
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run unit tests
+        run: pytest tests/ -v
+
+      - name: Run evaluation quality gate
+        run: python ci_eval_gate.py
